@@ -1,0 +1,16 @@
+# Ignore datasets and models (DVC will track these)
+/data/
+/models/
+
+# Ignore MLflow logs (Too many files for Git)
+/mlruns/
+
+# Ignore temporary zip files
+experiment_data.zip
+
+# Ignore Jupyter and Python temp files
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+/models
+/data
