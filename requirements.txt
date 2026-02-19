@@ -1,7 +1,6 @@
-tensorflow
-mlflow
-dvc
-matplotlib
-seaborn
-scikit-learn
-dvc
+fastapi==0.109.2
+uvicorn==0.27.1
+python-multipart==0.0.9
+tensorflow==2.19.0
+Pillow==10.2.0
+numpy==1.26.4
