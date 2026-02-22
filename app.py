@@ -1,14 +1,29 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
+import os
+import time
+import logging 
+from fastapi.responses import PlainTextResponse
 
 # Initialize FastAPI app
 app = FastAPI(title="Pet Classifier API", description="API for Cats vs Dogs Classification")
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("pet-classifier")
+
+_METRICS = {
+    "requests_total": 0,
+    "predict_requests_total": 0,
+    "predict_failures_total": 0,
+    "last_predict_latency_ms": 0.0,
+}
+
+
 # Load the model at startup
-MODEL_PATH = "models/baseline_cnn.h5"
+MODEL_PATH = os.getenv("MODEL_PATH", "models/baseline_cnn.h5")
 try:
     model = tf.keras.models.load_model(MODEL_PATH)
     print("Model loaded successfully.")
@@ -26,6 +41,20 @@ def health_check():
         raise HTTPException(status_code=503, detail="Model not loaded. Service unavailable.")
     return {"status": "healthy", "model": "loaded"}
 
+@app.get("/metrics", response_class=PlainTextResponse)
+def metrics():
+    """Metrics endpoint to expose service metrics."""
+    lines = [f"{k} {v}" for k, v in _METRICS.items()]
+    return "\n".join(lines) + "\n"
+
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    """Middleware to track metrics."""
+    _METRICS["requests_total"] += 1
+    return await call_next(request)
+
+start = time.time()
+_METRICS["predict_requests_total"] += 1
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     """Prediction endpoint: Accepts an image and returns Cat/Dog probability."""
@@ -56,6 +85,13 @@ async def predict(file: UploadFile = File(...)):
         # We invert it (1 - 0.1 = 0.9) so the user sees a "90% confidence it's a Cat".
         confidence = probability if class_label == "Dog" else (1.0 - probability)
 
+        latency_ms = (time.time() - start) * 1000
+        _METRICS["last_predict_latency_ms"] = float(latency_ms)
+        logger.info(
+            "prediction_done filename=%s label=%s confidence=%.4f latency_ms=%.2f",
+            file.filename, class_label, float(confidence), latency_ms
+        )
+
         return {
             "filename": file.filename,
             "prediction": class_label,
@@ -63,4 +99,8 @@ async def predict(file: UploadFile = File(...)):
         }
 
     except Exception as e:
+        
+        _METRICS["predict_failures_total"] += 1
+        logger.exception("prediction_failed filename=%s err=%s", getattr(file, "filename", "unknown"), str(e))
+
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")

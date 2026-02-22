@@ -1,0 +1,7 @@
+file,true_label,pred_label,confidence,correct
+89570160-0c19-4724-bcd6-3bf59a1e7552.png,Cat,Cat,1.0,True
+52cd45d4-1f88-466a-a25b-401b61e5f23c.png,Cat,Cat,1.0,True
+b29105b2-2289-40b3-9063-53cf387648d8.png,Cat,Cat,1.0,True
+0d423eca-406f-47e8-a7f4-8658393c443f.png,Dog,Dog,1.0,True
+fea7aaf9-3a75-4d6e-9955-959610296d21.png,Dog,Dog,1.0,True
+955a3409-7b1c-4f5b-8c3f-d8cba804539d.png,Dog,Dog,1.0,True
