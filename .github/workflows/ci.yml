@@ -42,6 +42,12 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    # Mock the models directory for Docker build <--
+    - name: Mock Model for Docker Build
+      run: |
+        mkdir -p models
+        touch models/baseline_cnn.h5
+
     # 6. Build and Push the Docker Image
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v4
