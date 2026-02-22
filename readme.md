@@ -3,6 +3,8 @@
 An end-to-end MLOps pipeline for classifying images of Cats and Dogs. This project demonstrates model development, experiment tracking, data versioning, containerization, and automated CI/CD deployment.
 
 ---
+## Demo: 
+- https://drive.google.com/file/d/1AK0HQjvAuXP5AUhSODfW0PkURYrcqYwj/view?usp=sharing
 
 ## 📁 Project Structure
 
