@@ -30,6 +30,8 @@ jobs:
 
     # 4. Run Automated Tests
     - name: Run Unit Tests
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         pytest tests/
 
