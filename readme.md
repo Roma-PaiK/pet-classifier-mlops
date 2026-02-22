@@ -157,6 +157,9 @@ pytest -q
 - Push changes to GitHub
 - Go to Actions tab
 - Confirm workflow success (tests + docker build)
+<img width="1728" height="495" alt="Screenshot 2026-02-22 at 5 10 16 PM" src="https://github.com/user-attachments/assets/4f46d3d5-f465-42fb-9968-232be40ee72f" />
+<img width="1728" height="578" alt="Screenshot 2026-02-22 at 5 10 54 PM" src="https://github.com/user-attachments/assets/0643b42d-fbae-4089-9696-2b2d71d6ccab" />
+<img width="1728" height="578" alt="Screenshot 2026-02-22 at 5 11 07 PM" src="https://github.com/user-attachments/assets/827881b1-d61a-4d1f-a425-57697f39e7ab" />
 
 ### M4 — Deployment (Docker Compose)
 ```bash
