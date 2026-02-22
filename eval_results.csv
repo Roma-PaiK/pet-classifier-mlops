@@ -1,0 +1,7 @@
+file,true_label,pred_label,confidence,correct
+1.jpg,Cat,Cat,0.9881,True
+10.jpg,Cat,Cat,0.5793,True
+100.jpg,Cat,Dog,0.8927,False
+10003.jpg,Dog,Dog,0.9433,True
+10004.jpg,Dog,Dog,0.9947,True
+10005.jpg,Dog,Dog,0.6898,True

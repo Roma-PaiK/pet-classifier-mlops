@@ -1,57 +1,33 @@
-name: CI Pipeline (Build, Test & Push)
+name: CI
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
+  push:
     branches: [ "master" ]
 
 jobs:
-  test-and-build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    # 1. Checkout the repository code
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    # 2. Set up Python environment
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
-    # 3. Install dependencies and testing framework
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
 
-    # 4. Run Automated Tests
-    - name: Run Unit Tests
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-      run: |
-        pytest tests/
+      - name: Run tests
+        run: pytest -q
 
-    # 5. Log in to Docker Hub (Artifact Registry)
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    # Mock the models directory for Docker build <--
-    - name: Mock Model for Docker Build
-      run: |
-        mkdir -p models
-        touch models/baseline_cnn.h5
-
-    # 6. Build and Push the Docker Image
-    - name: Build and Push Docker Image
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/pet-classifier-api:latest
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t pet-classifier-api:ci .
