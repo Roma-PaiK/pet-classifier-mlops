@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
+from utils import preprocess_image, format_prediction
 
 # Initialize FastAPI app
 app = FastAPI(title="Pet Classifier API", description="API for Cats vs Dogs Classification")
@@ -35,26 +36,30 @@ async def predict(file: UploadFile = File(...)):
     try:
         # 1. Read the uploaded image
         contents = await file.read()
-        image = Image.open(io.BytesIO(contents)).convert("RGB")
+        # image = Image.open(io.BytesIO(contents)).convert("RGB")
         
         # 2. Preprocess the image
-        image = image.resize(IMG_SIZE)
-        img_array = tf.keras.preprocessing.image.img_to_array(image)
-        img_array = np.expand_dims(img_array, axis=0) # Create a batch of 1
+        # image = image.resize(IMG_SIZE)
+        # img_array = tf.keras.preprocessing.image.img_to_array(image)
+        # img_array = np.expand_dims(img_array, axis=0) # Create a batch of 1
         
         # Note: Your model already has layers.Rescaling(1./255) inside it, 
         # so we pass the raw 0-255 array directly to model.predict!
+
+        img_array = preprocess_image(contents, IMG_SIZE)
 
         # 3. Make prediction
         prediction = model.predict(img_array)
         probability = float(prediction[0][0])
         
         # Keras image_dataset_from_directory sorts alphabetically (Cats=0, Dogs=1)
-        class_label = "Dog" if probability > 0.5 else "Cat"
+        # class_label = "Dog" if probability > 0.5 else "Cat"
         
         # If it's a Cat, the model outputs a low number (e.g., 0.1). 
         # We invert it (1 - 0.1 = 0.9) so the user sees a "90% confidence it's a Cat".
-        confidence = probability if class_label == "Dog" else (1.0 - probability)
+        # confidence = probability if class_label == "Dog" else (1.0 - probability)
+
+        class_label, confidence = format_prediction(probability)
 
         return {
             "filename": file.filename,
